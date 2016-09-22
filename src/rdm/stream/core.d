@@ -28,15 +28,15 @@ interface SeekableStream
     void close();
 }
 
-interface IOStream : InputStream, OutputStream
-{
-}
-
 interface RIStream : InputStream, SeekableStream
 {
 }
 
 interface ROStream : OutputStream, SeekableStream
+{
+}
+
+interface IOStream : InputStream, OutputStream
 {
 }
 
@@ -50,27 +50,12 @@ enum SeekMode : int
     offset = 1,
 }
 
-auto throwAway(T)(T stream) if (is(T : InputStream) || is(T : OutputStream))
-{
-    struct Result
-    {
-        T object;
-        alias object this;
-
-        this(T object)
-        {
-            this.object = object;
-        }
-
-        ~this()
-        {
-            this.object.close();
-            delete this.object;
-        }
-    }
-
-    return Result(stream);
-}
+enum isInputStream(T) = is(T == InputStream) || is(T : InputStream);
+enum isOutputStream(T) = is(T == OutputStream) || is(T : OutputStream);
+enum isRIStream(T) = is(T == RIStream) || is(T : RIStream);
+enum isROStream(T) = is(T == ROStream) || is(T : ROStream);
+enum isIOStream(T) = is(T == IOStream) || is(T : IOStream);
+enum isRIOStream(T) = is(T == RIOStream) || is(T : RIOStream);
 
 auto readAs(T)(InputStream stream)
 {
@@ -96,6 +81,33 @@ auto writeAs(T)(OutputStream stream, T data)
         stream.write((cast(void*) data.ptr)[0 .. data.length * typeof(T.init[0]).sizeof]);
     else
         stream.write((cast(void*)&data)[0 .. T.sizeof]);
+}
+
+void copyTo(InputStream source, OutputStream destination, ulong amount)
+{
+    import core.stdc.stdlib : alloca;
+
+    ulong total;
+    auto buffer = alloca(1024)[0 .. 1024];
+    while (total < amount)
+    {
+        size_t amountRead = source.read(buffer);
+        total += amountRead;
+        destination.write(buffer[0 .. amountRead]);
+    }
+}
+
+void copyTo(InputStream source, OutputStream destination)
+{
+    import core.stdc.stdlib : alloca;
+
+    ulong total;
+    auto buffer = alloca(1024)[0 .. 1024];
+    while (source.dataPending)
+    {
+        size_t amountRead = source.read(buffer);
+        destination.write(buffer[0 .. amountRead]);
+    }
 }
 
 class StreamException : Exception

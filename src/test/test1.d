@@ -13,9 +13,8 @@ void main()
     auto layer = new Layer3D();
     auto shader = new Shader(vertexShader, fragmentShader);
     auto camera = new Camera(70.toDegrees(), 640 / 480, 0.1, 1000);
-    //    auto meshAsset = new RDMesh(scoped!FileStream("res/mesh.rdm", "rb"));
-    auto mesh = GLMesh([Vector3f(0, 5, 5), Vector3f(-5, 0, 5), Vector3f(5, 0, 5)],
-            null, null, null, [0u, 1u, 2u]);
+    auto meshAsset = new RDMesh(scoped!FileStream("res/mesh.rdm", "rb"));
+    auto mesh = GLMesh(meshAsset);
     auto texture = GLTexture();
     auto model = new Model(mesh, texture);
     layer.shader = shader;
@@ -24,7 +23,7 @@ void main()
     app.display.drawables.add(layer);
 
     double sensitivity = 10;
-    bool rotateCamera(SDL_MouseMotionEvent* event, double delta)
+    NextEventProcedure rotateCamera(SDL_MouseMotionEvent* event, double delta)
     {
         if (event.state & SDL_BUTTON(SDL_BUTTON_LEFT))
         {
@@ -34,10 +33,10 @@ void main()
                     .rotate(camera.transform.rotation), delta * -event.yrel * sensitivity)
                 * camera.transform.rotation;
         }
-        return true;
+        return NextEventProcedure.propergate;
     }
 
-    bool camTrans(SDL_KeyboardEvent* event, double delta)
+    NextEventProcedure translateCamera(SDL_KeyboardEvent* event, double delta)
     {
         Vector3f direction;
         switch (event.keysym.sym)
@@ -62,24 +61,27 @@ void main()
             break;
         case SDLK_1:
             camera.transform.rotation = Quaternion();
-            return true;
+            return NextEventProcedure.propergate;
         case SDLK_2:
             camera.transform.translation = Vector3f(0, 0, 0);
-            return true;
+            return NextEventProcedure.propergate;
         case SDLK_UP:
             camera.transform.rotation = Quaternion(Vector3f(0, 1, 0),
                     delta * sensitivity) * camera.transform.rotation;
             break;
         case SDLK_ESCAPE:
             app.stop();
-            return true;
+            return NextEventProcedure.propergate;
         default:
-            return true;
+            return NextEventProcedure.propergate;
         }
         camera.transform.translation += direction.rotate(
                 camera.transform.rotation) * delta * 10 * sensitivity;
-        return true;
+        return NextEventProcedure.propergate;
     }
+
+    app.eventManager.keyDownHooks ~= &translateCamera;
+    app.eventManager.moveHooks ~= &rotateCamera;
 
     app.run();
 }
@@ -93,7 +95,7 @@ in vec2 vTextureCoordinate;
 
 void main()
 {
-    gl_FragColor = vec4(1,1,1,1);//texture(iTexture1, vec2(vTextureCoordinate.x * 20, vTextureCoordinate.y * 20));
+    gl_FragColor = texture(iTexture1, vTextureCoordinate);
 }
 `;
 

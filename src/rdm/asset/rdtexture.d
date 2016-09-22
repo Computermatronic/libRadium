@@ -79,15 +79,6 @@ class RDTexture
     }
 }
 
-class RDTextureException : Exception
-{
-	@nogc @safe pure nothrow this(string msg, string file = __FILE__,
-		size_t line = __LINE__, Throwable next = null)
-	{
-		super(msg, file, line, next);
-	}
-}
-
 private struct RDTextureHeader
 {
 	uint magicNumber;
@@ -109,5 +100,14 @@ private size_t pixelSize(RDTexturePixelFormat format)
 			return RDTexturePixelRGBAi32.sizeof;
 		case RGBAf32:
 			return RDTexturePixelRGBAf32.sizeof;
+	}
+}
+
+class RDTextureException : Exception
+{
+	@nogc @safe pure nothrow this(string msg, string file = __FILE__,
+		size_t line = __LINE__, Throwable next = null)
+	{
+		super(msg, file, line, next);
 	}
 }
