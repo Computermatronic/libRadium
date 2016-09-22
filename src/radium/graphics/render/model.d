@@ -36,7 +36,7 @@ class Model : Drawable
     {
         Matrix4f mvp;
         if (mat !is null)
-            mvp = mat.opBinary!"*"(transform.getMatrix());
+            mvp = *mat * transform.getMatrix();
         else
             mvp = transform.getMatrix();
         material.shader.setUniform(material.shader.uniforms.mvp, &mvp);

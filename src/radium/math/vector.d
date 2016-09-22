@@ -182,6 +182,12 @@ struct Vector(uint size, Type) if (size > 1)
             return this[3] = assign;
         }
     }
+    
+    string toString()
+    {
+    	import std.format : format;
+    	return format("Vector(%(%s,%))",m_vector);
+    }
 }
 
 enum isVector(T) = isInstanceOf!(Vector, T);

@@ -22,5 +22,5 @@ interface Bindable
 
 interface Projector
 {
-    Matrix4f getProjection();
+	Matrix4f getProjection();
 }

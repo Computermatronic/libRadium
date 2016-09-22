@@ -2,6 +2,7 @@ module radium.graphics.render.shader;
 
 import radium.graphics.utils;
 import radium.graphics.core.primatives;
+import radium.graphics.render.texture;
 
 import radium.math.matrix;
 
@@ -14,6 +15,7 @@ class Shader : Bindable
     struct Uniforms
     {
         GLuint mvp;
+        GLuint tex1;
     }
 
     GLuint vertexShader;
@@ -33,7 +35,7 @@ class Shader : Bindable
 
         glBindAttribLocation(shaderProgram, VertexAttributeArray.position, "iPosition");
         glBindAttribLocation(shaderProgram,
-                VertexAttributeArray.textureCoordinates, "iTextureCoordinat");
+                VertexAttributeArray.textureCoordinates, "iTextureCoordinate");
         glBindAttribLocation(shaderProgram, VertexAttributeArray.normal, "iNormal");
         glLinkProgram(shaderProgram);
         GLint linkStatus;
@@ -52,6 +54,7 @@ class Shader : Bindable
             throw new GLException("Could not link shader \n" ~ log);
         }
         uniforms.mvp = glGetUniformLocation(shaderProgram, "iMVP");
+        uniforms.tex1 = glGetUniformLocation(shaderProgram, "iTexture1");
     }
 
     GLuint compileShader(string src, GLenum type)
@@ -89,6 +92,8 @@ class Shader : Bindable
     {
         static if (is(T == Matrix4f))
             glUniformMatrix4fv(uniform, 1, GL_TRUE, cast(float*) data.m_matrix.ptr);
+        else static if(is(T == Texture))
+	        glUniform1i(uniform, data.tex);
         else
             static assert(0, "Invalid type for setUniform");
     }

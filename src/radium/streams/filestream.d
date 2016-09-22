@@ -22,6 +22,7 @@ class FileStream : Stream
     this(string file, string mode)
     {
         this.file = fopen(file.toStringz(), mode.toStringz());
+        enforce!StreamException(file !is null, "Failed to open file "~file);
     }
 
     this(FILE* file)

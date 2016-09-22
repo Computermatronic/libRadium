@@ -1,3 +1,7 @@
 module radium.math;
 
-public import radium.math.conv, radium.math.matrix, radium.math.quaternion, radium.math.utils, radium.math.vector;
+public import radium.math.conv;
+public import radium.math.matrix;
+public import radium.math.quaternion;
+public import radium.math.utils;
+public import radium.math.vector;

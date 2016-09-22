@@ -28,18 +28,16 @@ class GraphicsEngine
         this.videoHeight = videoHeight;
         DerelictSDL2.load();
         DerelictGL3.load();
-        enforce!SDLException(SDL_Init(SDL_INIT_EVERYTHING), "Failed to load SDL2");
+        enforce!SDLException(SDL_Init(SDL_INIT_EVERYTHING) == 0, "Failed to load SDL2");
 
         window = enforce!SDLException(SDL_CreateWindow(windowTitle.toStringz,
                 SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                 videoWidth, videoHeight, SDL_WINDOW_OPENGL | flags), "Failed to create SDL window");
-        enforce!SDLException(SDL_GL_CreateContext(window), "Failed to create SDL opengl context");
-
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+        enforce!SDLException(SDL_GL_CreateContext(window), "Failed to create SDL opengl context");
         DerelictGL3.reload(GLVersion.GL30);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -57,7 +55,7 @@ class GraphicsEngine
     void run()
     {
         running = true;
-        engineLoop();
+        loop();
     }
 
     bool quit()
@@ -66,22 +64,22 @@ class GraphicsEngine
         return true;
     }
 
-    void engineLoop()
+    void loop()
     {
         auto lastTime = MonoTime.currTime;
         auto delta = 0.seconds;
-        float dt;
+        double dt;
         while (running)
         {
             tick(dt);
             auto currTime = MonoTime.currTime;
             delta = lastTime - currTime;
             lastTime = currTime;
-            dt = delta.total!"nsecs"();
+            dt = (cast(double)delta.total!"nsecs"()) / 1000000000.0;
         }
     }
 
-    void tick(float dt)
+    void tick(double dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0, 0, 0, 0);

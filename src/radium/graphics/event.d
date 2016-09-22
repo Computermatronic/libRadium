@@ -4,10 +4,10 @@ private import core.time;
 public import derelict.sdl2.sdl;
 
 alias QuitEvent = bool delegate();
-alias MouseMoveEvent = bool delegate(SDL_MouseMotionEvent* event, float delta);
-alias MouseClickEvent = bool delegate(SDL_MouseButtonEvent* event, float delta);
-alias KeyEvent = bool delegate(SDL_KeyboardEvent* event, float delta);
-alias UpdateEvent = void delegate(float delta);
+alias MouseMoveEvent = bool delegate(SDL_MouseMotionEvent* event, double delta);
+alias MouseClickEvent = bool delegate(SDL_MouseButtonEvent* event, double delta);
+alias KeyEvent = bool delegate(SDL_KeyboardEvent* event, double delta);
+alias UpdateEvent = void delegate(double delta);
 
 class EventManager
 {
@@ -18,7 +18,7 @@ class EventManager
     KeyEvent[] keyUpHooks;
     UpdateEvent[] updateHooks;
 
-    void dispatchEvent(SDL_Event* sdl_event, float delta)
+    void dispatchEvent(SDL_Event* sdl_event, double delta)
     {
         switch (sdl_event.type)
         {
@@ -56,7 +56,7 @@ class EventManager
         }
     }
 
-    void update(float delta)
+    void update(double delta)
     {
         foreach_reverse (updateHook; updateHooks)
             updateHook(delta);

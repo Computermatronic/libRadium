@@ -18,7 +18,7 @@ class SDLException : RadiumException
     this(string msg, string file = __FILE__,
             size_t line = __LINE__, Throwable next = null)
     {
-        super(msg ~ getSDLError(), file, line, next);
+        super(msg ~ "\nSDL Error: " ~ getSDLError(), file, line, next);
     }
 }
 
@@ -37,18 +37,17 @@ Mesh loadRDMesh(RDMesh rmesh)
     Mesh result = new Mesh(new Vector3f[rmesh.vertices.length],
             new Vector3f[rmesh.vertices.length], new Vector3f[rmesh.vertices.length],
             new TextureCoordinate[rmesh.vertices.length], new uint[rmesh.triangles.length * 3]);
-
     foreach (i, vertex; rmesh.vertices)
     {
         result.positions[i] = vertex.position;
         result.textureCoordinates[i].x = vertex.texCoordX;
-        result.textureCoordinates[i].y = vertex.texCoordY;
+	    result.textureCoordinates[i].y = vertex.texCoordY;
     }
     foreach (i, triangle; rmesh.triangles)
     {
-        result.indexes[i * 3] = triangle.vert1.index;
-        result.indexes[i * 3 + 1] = triangle.vert2.index;
-        result.indexes[i * 3 + 2] = triangle.vert3.index;
+        result.indices[i * 3] = triangle.vert1.index;
+        result.indices[i * 3 + 1] = triangle.vert2.index;
+        result.indices[i * 3 + 2] = triangle.vert3.index;
     }
 
     return result;

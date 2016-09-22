@@ -32,10 +32,8 @@ class Layer : Drawable
     {
         if (!visible)
             return;
-        Matrix4f projection = Matrix4f.identity();
         glViewport(x, y, x + width, y + height);
-        if (camera !is null)
-            projection = camera.getProjection();
+        Matrix4f projection = camera.getProjection();
         foreach (drawable; drawables)
         {
             drawable.draw(dt, &projection);

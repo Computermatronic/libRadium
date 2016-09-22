@@ -16,11 +16,12 @@ class Transform
 
     Matrix4f getMatrix()
     {
+        Matrix4f mat = Matrix4f.identity;
         if (parent !is null)
-            return parent.getMatrix() * createTranslationMatrix(
-                    translation) * rotation.matrix() * createScaleMatrix(scale);
-        else
-            return createTranslationMatrix(translation) * rotation.matrix() * createScaleMatrix(
-                    scale);
+            mat *= parent.getMatrix();
+//        return mat * createTranslationMatrix(translation) * rotation.matrix() * createScaleMatrix(
+//                scale);
+        return mat * createScaleMatrix(scale) * rotation.matrix() * createTranslationMatrix(
+                translation);
     }
 }
